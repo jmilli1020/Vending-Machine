@@ -18,7 +18,7 @@ namespace Capstone.Classes
             int changeAfterDs = 0;
             int numberOfNs = 0;
             int numberOfPs = 0;
-            int totalCents = decimal.ToInt32(change) * 100;
+            int totalCents = decimal.ToInt32(change * 100);
 
             if (totalCents >= 25)
             {

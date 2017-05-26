@@ -8,19 +8,26 @@ namespace Capstone.Classes
 {
     public class Items
     {
-        public Items(decimal cost, string type)
+        public Items(decimal cost, string productName, string type)
         {
             this.cost = cost;
+            this.productName = productName;
             this.type = type;
         }
 
         private decimal cost;
+        private string productName;
         private string type;
 
 
         public string ReturnType()
         {
             return type;
+        }
+
+        public string GetProductName()
+        {
+            return productName;
         }
 
         public decimal GetCost()

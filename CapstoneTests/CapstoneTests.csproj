@@ -53,6 +53,11 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ChangeTests.cs" />
+    <Compile Include="ItemTests.cs" />
+    <Compile Include="UserInterfaceTests.cs" />
+    <Compile Include="VendingMachinTests.cs" />
+    <Compile Include="VMFileReaderTests.cs" />
+    <Compile Include="VMFileWriterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Capstone\Capstone.csproj">

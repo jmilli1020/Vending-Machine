@@ -29,6 +29,7 @@ namespace Capstone.Classes
                     string[] splits = line.Split('|');
                     List<Items> ItemsList = new List<Items>();
                     decimal cost = Decimal.Parse(splits[2]);
+                    string productName = (splits[1] + " " + splits[0]);
                     string type = "";
 
                     for (int i = 0; i < 5; i++)
@@ -49,7 +50,7 @@ namespace Capstone.Classes
                         {
                             type = "Chew Chew, Yum!";
                         }
-                        Items Item = new Items(cost, type);
+                        Items Item = new Items(cost, productName, type);
                         ItemsList.Add(Item);
                         Inventory[splits[0]] = ItemsList;
                     }

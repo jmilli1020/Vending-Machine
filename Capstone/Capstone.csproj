@@ -48,6 +48,7 @@
     <Compile Include="Classes\UserInterface.cs" />
     <Compile Include="Classes\VendingMachine.cs" />
     <Compile Include="Classes\VendingMachineFileReader.cs" />
+    <Compile Include="Classes\VendingMachineFileWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
