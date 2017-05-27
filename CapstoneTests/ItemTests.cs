@@ -9,22 +9,24 @@ namespace CapstoneTests
     public class ItemTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void ReturnTypeTest()
         {
-            public string ReturnType()
-        {
-            return type;
+            Items item = new Items((decimal)3.50,"a1","Crunch Crunch, Yum!");
+            Assert.AreEqual("Crunch Crunch, Yum!", item.GetType());
         }
 
-        public string GetProductName()
+        [TestMethod]
+        public void GetProductNameTest()
         {
-            return productName;
+            Items item = new Items((decimal)3.50,"a1","Crunch Crunch, Yum!");
+            Assert.AreEqual("a1", item.GetProductName());
         }
 
-        public decimal GetCost()
+        [TestMethod]
+        public void GetCostTests()
         {
-            return cost;
-        }
+            Items item = new Items((decimal)3.50,"a1","Crunch Crunch, Yum!");
+            Assert.AreEqual((decimal)3.50, item.GetCost());
         }
     }
 }

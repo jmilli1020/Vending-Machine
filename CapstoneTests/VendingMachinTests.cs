@@ -9,9 +9,7 @@ namespace CapstoneTests
         [TestMethod]
         public void TestMethod1()
         {
-            Purchase()
-                FeedMoney()
-                CompleteTransacion()
+
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Capstone.Classes;
 
 namespace CapstoneTests
 {
@@ -7,11 +8,9 @@ namespace CapstoneTests
     public class UserInterfaceTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void MainMenuTests()
         {
-            MainMenu()
-                DisplayItems()
-                MakePurchase()
+            
         }
     }
 }
