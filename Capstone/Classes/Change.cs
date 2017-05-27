@@ -41,7 +41,7 @@ namespace Capstone.Classes
                 numberOfNs = totalCents / 5;
                 numberOfPs = totalCents % 5;
             }
-            return $"Your change is { numberOfQs } quarters, {numberOfDs} dimes, {numberOfNs} nickels";
+            return $"{ numberOfQs } quarters, {numberOfDs} dimes, {numberOfNs} nickels";
 
         }
     }

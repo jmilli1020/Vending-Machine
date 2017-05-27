@@ -13,6 +13,8 @@ namespace Capstone.Classes
         private VendingMachine VM;
         private List<string> productCodes;
         private string userPayment;
+        private string amountDue;
+        private string amountPaid;
 
         public UserInterface()
         {
@@ -42,7 +44,8 @@ namespace Capstone.Classes
                 {
                     break;
                 }
-            }     
+            }
+            
         }
 
         public void DisplayItems() //  want to display the items persistently. Ideally I would also display remaining stock.
@@ -70,7 +73,7 @@ namespace Capstone.Classes
         public void EnterSelections()
         {
             DisplayItems();
-            Console.WriteLine("Please enter the product code or [1] to return to main menu.");
+            Console.WriteLine("Please enter the product code or [1] return to main menu.");
             string userInput = Console.ReadLine().ToUpper();
             if(userInput == "1")
             {
@@ -83,14 +86,23 @@ namespace Capstone.Classes
             {
                 DisplayItems();
                 Console.WriteLine("You've currently selected: " + DisplayCurrentSelections());
-                Console.WriteLine("Enter another product code, [C] to confirm selection(s), or [1] to return to main menu.");
+                Console.WriteLine("Enter another product code, or: \n[C] to confirm selection(s) \n[1] to cancel current selections and return to the main menu.");
                 userInput = Console.ReadLine().ToUpper();
-                if (userInput == "C")
+                if (userInput == "C" && productCodes.Count > 0)
                 {
                     break;
                 }
+                else if (userInput == "C" && productCodes.Count == 0)
+                {
+                    Console.WriteLine("You must enter a product code before confirming your selection.");
+                    EnterSelections(); //This still needs some work. Im going to come back to it later.
+                }
                 else if (userInput == "1")
                 {
+                    while (productCodes.Count > 0)
+                    {
+                        productCodes.Remove(productCodes[0]);
+                    }
                     MainMenu();
                 }
                 else
@@ -99,28 +111,68 @@ namespace Capstone.Classes
                 }
             }
             Console.Clear();
+            amountDue = VM.GetAmountDue(productCodes).ToString("C");
             DisplayAmountDueAndAmountPaid();
+            FeedMoney();
         }
 
         public void DisplayAmountDueAndAmountPaid()
         {
-            Console.WriteLine($"Your amount due is: {VM.GetAmountDue(productCodes)}");
-            Console.WriteLine($"Amount paid: {VM.GetAmountPaid(userPayment)}");
-            FeedMoney();
+            Console.WriteLine($"Your amount due is: {amountDue}");
+            Console.WriteLine($"Amount paid: {amountPaid}");
         }
 
         public void FeedMoney()
         {
             while (true)
             {
-                DisplayAmountDueAndAmountPaid();
                 Console.WriteLine("Press [1] to add 1 dollar.");
                 Console.WriteLine("Press [2] to add 2 dollars.");
                 Console.WriteLine("Press [3] to add 5 dollars.");
                 Console.WriteLine("Press [4] to add 10 dollars.");
-                userPayment = Console.ReadLine().ToLower();
-                VM.GetAmountPaid(userPayment);
+                Console.WriteLine("Press [C] to confirm payment");
+                Console.WriteLine("Press [Q] to cancel selections. Return to main menu.");
+                userPayment = Console.ReadLine().ToUpper();
+                if (userPayment == "C")
+                {
+                    if(VM.DidUserPayEnough())
+                    {
+                        Console.Clear();
+                        DisplayChangeAndEndTransaction();
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("Please insert more money before confirming payment.");
+                        DisplayAmountDueAndAmountPaid();
+                        FeedMoney();
+                    }                   
+                }
+                else if (userPayment == "Q")
+                {
+                    while (productCodes.Count > 0)
+                    {
+                        productCodes.Remove(productCodes[0]);
+                    }
+                    VM.GetAmountPaid(userPayment);
+                    amountPaid = "";
+                    amountDue = "";
+                    MainMenu();
+                }
+                amountPaid = VM.GetAmountPaid(userPayment).ToString("C");
+                Console.Clear();
+                DisplayAmountDueAndAmountPaid();
             }
+        }
+
+        public void DisplayChangeAndEndTransaction()
+        {
+            Console.WriteLine(VM.GetChange());
+            foreach (string item in VM.GetTypes(productCodes))
+            {
+                Console.WriteLine(item);
+            }
+            Console.ReadLine();
         }
 
 

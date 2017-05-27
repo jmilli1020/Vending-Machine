@@ -62,10 +62,47 @@ namespace Capstone.Classes
                 amountPaid += 10;
                 return amountPaid;
             }
+            else if (userPayment == "Q")
+            {
+                amountPaid = 0;
+                amountDue = 0;
+            }
             return amountPaid;
-
         }
-        
+
+        public bool DidUserPayEnough()
+        {
+            if (amountPaid > amountDue)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public string GetChange()
+        {
+            Change change = new Change();
+            return "Your change is: " + (amountDue-amountPaid).ToString("C") + "\n"
+                + "Returning: " + change.GetChange(amountPaid, amountDue);
+        }
+
+        public List<string> GetTypes(List<string> ProductCodes)
+        {
+            List<string> types = new List<string>();
+            foreach (string productCode in ProductCodes)
+            {
+                foreach (KeyValuePair<string, List<Items>> KVP in inventory)
+                {
+                    if (KVP.Key == productCode)
+                    {
+                        List<Items> item = KVP.Value;
+                        types.Add(item[0].ReturnType());
+                    }
+                }
+            }
+            return types;
+        }
+
         public void CompleteTransaction(List<string> productCodes)
         {
             string itemType = "";
