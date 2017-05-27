@@ -9,7 +9,7 @@ namespace CapstoneTests
         [TestMethod]
         public void TestMethod1()
         {
-            WriteToLog()
+
         }
     }
 }

@@ -11,12 +11,17 @@ namespace Capstone.Classes
     public class UserInterface
     {
         private VendingMachine VM;
+        private List<string> productCodes;
+        private string userPayment;
+
         public UserInterface()
         {
             VendingMachineFileReader VR = new VendingMachineFileReader();
             Dictionary<string, List<Items>> Inventory = VR.ReadInventory();
             VendingMachine VM = new VendingMachine(Inventory);
             this.VM = VM;
+            List<string> productCodes = new List<string>();
+            this.productCodes = productCodes;
             MainMenu();
         }
 
@@ -25,52 +30,46 @@ namespace Capstone.Classes
             Console.Clear();
             while(true)
             {
-                Console.WriteLine("[1] Display vending machine items.");
-                Console.WriteLine("[2] Purchase Item.");
-                Console.WriteLine("[3] Exit vending machine");
+                DisplayItems();
+                Console.WriteLine("[1] Make a selection.");
+                Console.WriteLine("[2] Exit vending machine");
                 string userInput = Console.ReadLine();
                 if (userInput == "1")
                 {
-                    DisplayItems();
+                    EnterSelections();
                 }
                 else if (userInput == "2")
-                {
-                    MakePurchase();
-                }
-                else if (userInput == "3")
                 {
                     break;
                 }
             }     
         }
 
-        public void DisplayItems()
+        public void DisplayItems() //  want to display the items persistently. Ideally I would also display remaining stock.
         {
             Console.Clear();
             using (StreamReader sr = new StreamReader(Path.Combine(Environment.CurrentDirectory, "vendingmachine.csv")))
                 {
                     while (!sr.EndOfStream)
                     {
-                        Console.WriteLine(sr.ReadLine());
+                        Console.WriteLine("".PadRight(5) + sr.ReadLine()); //Im thinking about making this centered.
                     }
                 }
-            Console.WriteLine("Press [1] to make selection.");
-            Console.WriteLine("Press [2] to return to main menu.");
-            string userInput = Console.ReadLine();
-            if(userInput == "1")
-            {
-                MakePurchase();
-            }
-            if(userInput == "2")
-            {
-                MainMenu();
-            }
         }
 
-        public void MakePurchase()
+        public string DisplayCurrentSelections()
         {
-            List<string> productCodes = new List<string>();
+            string currentSelections = "";
+            foreach (string item in productCodes)
+            {              
+                currentSelections += " " + item.ToUpper();
+            }
+            return currentSelections;
+        }
 
+        public void EnterSelections()
+        {
+            DisplayItems();
             Console.WriteLine("Please enter the product code or [1] to return to main menu.");
             string userInput = Console.ReadLine().ToUpper();
             if(userInput == "1")
@@ -78,9 +77,12 @@ namespace Capstone.Classes
                 MainMenu();
             }
             productCodes.Add(userInput);
+            Console.Clear();
 
             while(true)
             {
+                DisplayItems();
+                Console.WriteLine("You've currently selected: " + DisplayCurrentSelections());
                 Console.WriteLine("Enter another product code, [C] to confirm selection(s), or [1] to return to main menu.");
                 userInput = Console.ReadLine().ToUpper();
                 if (userInput == "C")
@@ -95,11 +97,30 @@ namespace Capstone.Classes
                 {
                     productCodes.Add(userInput);
                 }
-                
             }
-            VM.Purchase(productCodes);
-            
-            
+            Console.Clear();
+            DisplayAmountDueAndAmountPaid();
+        }
+
+        public void DisplayAmountDueAndAmountPaid()
+        {
+            Console.WriteLine($"Your amount due is: {VM.GetAmountDue(productCodes)}");
+            Console.WriteLine($"Amount paid: {VM.GetAmountPaid(userPayment)}");
+            FeedMoney();
+        }
+
+        public void FeedMoney()
+        {
+            while (true)
+            {
+                DisplayAmountDueAndAmountPaid();
+                Console.WriteLine("Press [1] to add 1 dollar.");
+                Console.WriteLine("Press [2] to add 2 dollars.");
+                Console.WriteLine("Press [3] to add 5 dollars.");
+                Console.WriteLine("Press [4] to add 10 dollars.");
+                userPayment = Console.ReadLine().ToLower();
+                VM.GetAmountPaid(userPayment);
+            }
         }
 
 
