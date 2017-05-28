@@ -70,6 +70,18 @@ namespace Capstone.Classes
             return amountPaid;
         }
 
+        public bool DidUserEnterValidProductCode(string productCode)
+        {
+            foreach (KeyValuePair<string, List<Items>> KVP in inventory)
+            {
+                    if (KVP.Key == productCode)
+                    {
+                        return true;
+                    }
+            }
+            return false;
+        }
+
         public bool DidUserPayEnough()
         {
             if (amountPaid > amountDue)
@@ -105,7 +117,6 @@ namespace Capstone.Classes
 
         public void CompleteTransaction(List<string> productCodes)
         {
-            string productName = "";
             foreach (string productCode in productCodes)
             {
                 foreach (KeyValuePair<string, List<Items>> KVP in inventory)
@@ -113,9 +124,7 @@ namespace Capstone.Classes
                     if (productCode == KVP.Key)
                     {
                         List<Items> items = KVP.Value;
-                        productName = items[0].GetProductName();
                         KVP.Value.Remove(KVP.Value[0]);
-                        FW.WriteToLog(productName, amountPaid.ToString("C"), amountDue.ToString("C"));
                     }
                 }
             }

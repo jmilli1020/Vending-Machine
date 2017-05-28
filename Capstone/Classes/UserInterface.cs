@@ -48,7 +48,7 @@ namespace Capstone.Classes
             
         }
 
-        public void DisplayItems() //  want to display the items persistently. Ideally I would also display remaining stock.
+        public void DisplayItems() // I want to display the items persistently. Ideally I would also display remaining stock.
         {
             Console.Clear();
             using (StreamReader sr = new StreamReader(Path.Combine(Environment.CurrentDirectory, "vendingmachine.csv")))
@@ -80,7 +80,6 @@ namespace Capstone.Classes
             VM.GetAmountPaid(userPayment);
             amountPaid = "";
             amountDue = "";
-            MainMenu();
         }
 
         public void EnterSelections()
@@ -92,9 +91,17 @@ namespace Capstone.Classes
             {
                 MainMenu();
             }
-            productCodes.Add(userInput);
-            Console.Clear();
-
+            else if (VM.DidUserEnterValidProductCode(userInput))
+            {
+                productCodes.Add(userInput);
+                Console.Clear();
+            }
+            else
+            {
+                Console.WriteLine("You've entered an invalid product code. Please press return and try again.");
+                Console.ReadLine();
+                EnterSelections();
+            }
             while(true)
             {
                 DisplayItems();
@@ -108,15 +115,22 @@ namespace Capstone.Classes
                 else if (userInput == "C" && productCodes.Count == 0)
                 {
                     Console.WriteLine("You must enter a product code before confirming your selection.");
-                    EnterSelections(); //This still needs some work. Im going to come back to it later.
+                    EnterSelections(); //This still needs some work. Count is never truly 0. Im going to come back to this later.
                 }
                 else if (userInput == "1")
                 {
                     ClearSelectionsPayments();
+                    MainMenu();
                 }
                 else
                 {
-                    productCodes.Add(userInput);
+                    if(VM.DidUserEnterValidProductCode(userInput))
+                    {
+                        productCodes.Add(userInput);
+                        continue;
+                    }
+                    Console.WriteLine("You've entered an invalid product code. Please press return and try again.");
+                    Console.ReadLine();
                 }
             }
             Console.Clear();
@@ -160,6 +174,7 @@ namespace Capstone.Classes
                 else if (userPayment == "Q")
                 {
                     ClearSelectionsPayments();
+                    MainMenu();
                 }
                 amountPaid = VM.GetAmountPaid(userPayment).ToString("C");
                 Console.Clear();
@@ -182,9 +197,10 @@ namespace Capstone.Classes
 
             if (userInput == "1")
             {
+                ClearSelectionsPayments();
                 MainMenu();
             }
-            else if (userInput == "2");
+            else if (userInput == "2")
             {
                 Environment.Exit(0);
             }
