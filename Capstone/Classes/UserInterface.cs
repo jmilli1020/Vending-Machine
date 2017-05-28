@@ -96,14 +96,19 @@ namespace Capstone.Classes
             DisplayItems();
             Console.WriteLine("Please enter the product code or [1] return to main menu.");
             string userInput = Console.ReadLine().ToUpper();
-            if(userInput == "1")
+            if (userInput == "1")
             {
                 MainMenu();
             }
-            else if (VM.DidUserEnterValidProductCode(userInput))
+            else if (VM.DidUserEnterValidProductCode(userInput) && VM.RemoveItem(userInput))
             {
                 productCodes.Add(userInput);
                 Console.Clear();
+            }
+            else if (!VM.RemoveItem(userInput))
+            {
+                Console.WriteLine("Item is out of stock. Please press return and make a different selection.");
+                Console.ReadLine();
             }
             else
             {
@@ -131,19 +136,22 @@ namespace Capstone.Classes
                     ClearSelectionsPayments();
                     MainMenu();
                 }
-                else
+                else if (VM.DidUserEnterValidProductCode(userInput) && VM.RemoveItem(userInput))
                 {
-                    if(VM.DidUserEnterValidProductCode(userInput))
-                    {
-                        productCodes.Add(userInput);
-                        continue;
-                    }
-                    Console.WriteLine("You've entered an invalid product code. Please press return and try again.");
-                    Console.ReadLine();
+                    productCodes.Add(userInput);
+                    continue;
                 }
+                else if (!VM.RemoveItem(userInput))
+                {
+                    Console.WriteLine("Item is out of stock. Please press return and make a different selection.");
+                    Console.ReadLine();
+                    continue;
+                }
+                Console.WriteLine("You've entered an invalid product code. Please press return and try again.");
+                Console.ReadLine();
             }
             Console.Clear();
-            amountDue = VM.GetAmountDue(productCodes).ToString("C");
+            amountDue = VM.GetAmountDue().ToString("C");
             DisplayAmountDueAndAmountPaid();
             FeedMoney();
         }
@@ -199,14 +207,13 @@ namespace Capstone.Classes
         public void DisplayChangeAndEndTransaction()
         {
             ApplicationTitle();
-            VM.CompleteTransaction(productCodes);
-            //FW.WriteToLog()
+            VM.CompleteTransaction();
             Console.WriteLine(VM.GetChange());
-            foreach (string item in VM.GetTypes(productCodes))
+            foreach (string item in VM.GetTypes())
             {
                 Console.WriteLine(item);  
             }
-            Console.WriteLine("Thank you for shoppin at Virtual Vending Machines.");
+            Console.WriteLine("Thank you for shopping at Virtual Vending Machines.");
             Console.WriteLine("Press [1] to continue using the Virtual Vending Machine.");
             Console.WriteLine("Press [2] to exit the veding machine.");
             string userInput = Console.ReadLine();

@@ -10,32 +10,28 @@ namespace Capstone.Classes
     public class VendingMachine
     {
         private Dictionary<string,List<Items>> inventory;
+        private List<Items> SelectedItems;
         private VendingMachineFileWriter FW = new VendingMachineFileWriter();
         
         public VendingMachine(Dictionary<string, List<Items>> Inventory)
         {
             this.inventory = Inventory;
             this.amountDue = 0;
+            List<Items> SelectedItems = new List<Items>();
+            this.SelectedItems = SelectedItems;
         }
 
         private decimal amountDue;
         private decimal amountPaid;
 
-        public decimal GetAmountDue(List<string> ProductCodes)
+        public decimal GetAmountDue()
         {
             decimal cost = 0;
 
-            foreach (string productCode in ProductCodes)
+            foreach (Items item in SelectedItems)
             {
-                foreach (KeyValuePair<string, List<Items>> KVP in inventory)
-                {
-                    if (KVP.Key == productCode)
-                    {
-                        List<Items> item = KVP.Value;
-                        cost = item[0].GetCost();
-                    }
-                }
-                amountDue += cost;              
+                cost = item.GetCost();
+                amountDue += cost; 
             }
             return amountDue;
         }
@@ -100,38 +96,53 @@ namespace Capstone.Classes
             return changeInCoins;
         }
 
-        public List<string> GetTypes(List<string> ProductCodes)
+        public bool RemoveItem(string userInput)
         {
-            List<string> types = new List<string>();
-            foreach (string productCode in ProductCodes)
-            {
                 foreach (KeyValuePair<string, List<Items>> KVP in inventory)
                 {
-                    if (KVP.Key == productCode)
+                    if (userInput == KVP.Key && KVP.Value.Count > 0)
                     {
-                        List<Items> item = KVP.Value;
-                        types.Add(item[0].ReturnType());
+                        SelectedItems.Add(KVP.Value[0]);
+                        KVP.Value.Remove(KVP.Value[0]);
+                        return true;
                     }
                 }
+                return false;
+        }
+
+        //public AddItemsBack(List<string> productCodes)
+        //{
+        //    foreach (string productCode in productCodes)
+        //    {
+        //        foreach (KeyValuePair<string, List<Items>> KVP in inventory)
+        //        {
+        //            if (productCode == KVP.Key)
+        //            {
+        //                List<Items> items = KVP.Value;
+        //                KVP.Value.Add(KVP.Value[0]);
+        //            }
+        //        }
+        //    }
+        //}
+
+        public List<string> GetTypes()
+        {
+            List<string> types = new List<string>();
+            foreach (Items item in SelectedItems)
+            {
+                types.Add(item.ReturnType());
             }
             return types;
         }
 
-        public void CompleteTransaction(List<string> productCodes)
+        public void CompleteTransaction()
         {
             string productName = "";
-            foreach (string productCode in productCodes)
+
+            foreach (Items item in SelectedItems)
             {
-                foreach (KeyValuePair<string, List<Items>> KVP in inventory)
-                {
-                    if (productCode == KVP.Key)
-                    {
-                        List<Items> items = KVP.Value;
-                        KVP.Value.Remove(KVP.Value[0]);
-                        productName = items[0].GetProductName();
-                        FW.WriteToLog(productName, amountPaid.ToString("C"), amountDue.ToString("C"));
-                    }
-                }
+                productName = item.GetProductName();
+                FW.WriteToLog(productName, amountPaid.ToString("C"), amountDue.ToString("C"));
             }
         }
     }
