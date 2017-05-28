@@ -47,13 +47,19 @@ namespace Capstone.Classes
                 {
                     Environment.Exit(0);
                 }
-            }
-            
+            }          
+        }
+
+        public void ApplicationTitle()
+        {
+            Console.WriteLine((String.Format("{0," + ((Console.WindowWidth / 2) + ("Virtual Vending Machines Inc.".Length / 2)) + "}", "Virtual Vending Machines Inc.")));
         }
 
         public void DisplayItems() // I want to display the items persistently. Ideally I would also display remaining stock.
         {
             Console.Clear();
+            ApplicationTitle();
+            Console.WriteLine("Product Code".PadRight(15) + "Item".PadRight(15) + "Cost");
             using (StreamReader sr = new StreamReader(Path.Combine(Environment.CurrentDirectory, "vendingmachine.csv")))
                 {
                     while (!sr.EndOfStream)
@@ -144,6 +150,7 @@ namespace Capstone.Classes
 
         public void DisplayAmountDueAndAmountPaid()
         {
+            ApplicationTitle();
             Console.WriteLine($"Your amount due is: {amountDue}");
             Console.WriteLine($"Amount paid: {amountPaid}");
         }
@@ -191,6 +198,7 @@ namespace Capstone.Classes
 
         public void DisplayChangeAndEndTransaction()
         {
+            ApplicationTitle();
             VM.CompleteTransaction(productCodes);
             //FW.WriteToLog()
             Console.WriteLine(VM.GetChange());

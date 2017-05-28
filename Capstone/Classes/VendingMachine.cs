@@ -10,6 +10,7 @@ namespace Capstone.Classes
     public class VendingMachine
     {
         private Dictionary<string,List<Items>> inventory;
+        private VendingMachineFileWriter FW = new VendingMachineFileWriter();
         
         public VendingMachine(Dictionary<string, List<Items>> Inventory)
         {
@@ -93,8 +94,10 @@ namespace Capstone.Classes
         public string GetChange()
         {
             Change change = new Change();
-            return "Your change is: " + (amountDue-amountPaid).ToString("C") + "\n"
+            string changeInCoins = "Your change is: " + (amountDue-amountPaid).ToString("C") + "\n"
                 + "Returning: " + change.GetChange(amountPaid, amountDue);
+            FW.WriteToLog("GIVE CHANGE", amountDue.ToString("C"), "$0.00");
+            return changeInCoins;
         }
 
         public List<string> GetTypes(List<string> ProductCodes)
@@ -116,6 +119,7 @@ namespace Capstone.Classes
 
         public void CompleteTransaction(List<string> productCodes)
         {
+            string productName = "";
             foreach (string productCode in productCodes)
             {
                 foreach (KeyValuePair<string, List<Items>> KVP in inventory)
@@ -124,6 +128,8 @@ namespace Capstone.Classes
                     {
                         List<Items> items = KVP.Value;
                         KVP.Value.Remove(KVP.Value[0]);
+                        productName = items[0].GetProductName();
+                        FW.WriteToLog(productName, amountPaid.ToString("C"), amountDue.ToString("C"));
                     }
                 }
             }
