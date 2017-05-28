@@ -144,6 +144,10 @@ namespace Capstone.Classes
                 productName = item.GetProductName();
                 FW.WriteToLog(productName, amountPaid.ToString("C"), amountDue.ToString("C"));
             }
+            while (SelectedItems.Count > 0)
+            {
+                SelectedItems.Remove(SelectedItems[0]);
+            }
         }
     }
 }
