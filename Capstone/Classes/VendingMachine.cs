@@ -10,8 +10,7 @@ namespace Capstone.Classes
     public class VendingMachine
     {
         private Dictionary<string,List<Items>> inventory;
-        VendingMachineFileWriter FW = new VendingMachineFileWriter();
-
+        
         public VendingMachine(Dictionary<string, List<Items>> Inventory)
         {
             this.inventory = Inventory;
@@ -21,7 +20,7 @@ namespace Capstone.Classes
         private decimal amountDue;
         private decimal amountPaid;
 
-        public decimal GetAmountDue(List<string> ProductCodes)//Calculates amount due based off list of product codes
+        public decimal GetAmountDue(List<string> ProductCodes)
         {
             decimal cost = 0;
 

@@ -10,6 +10,7 @@ namespace Capstone.Classes
 {
     public class UserInterface
     {
+        private VendingMachineFileWriter FW;
         private VendingMachine VM;
         private List<string> productCodes;
         private string userPayment;
@@ -18,8 +19,10 @@ namespace Capstone.Classes
 
         public UserInterface()
         {
-            VendingMachineFileReader VR = new VendingMachineFileReader();
-            Dictionary<string, List<Items>> Inventory = VR.ReadInventory();
+            VendingMachineFileWriter FW = new VendingMachineFileWriter();
+            this.FW = FW;
+            VendingMachineFileReader FR = new VendingMachineFileReader();
+            Dictionary<string, List<Items>> Inventory = FR.ReadInventory();
             VendingMachine VM = new VendingMachine(Inventory);
             this.VM = VM;
             List<string> productCodes = new List<string>();
@@ -147,6 +150,7 @@ namespace Capstone.Classes
 
         public void FeedMoney()
         {
+            string previousAmountPaid = "$0.00";
             while (true)
             {
                 Console.WriteLine("Press [1] to add 1 dollar.");
@@ -177,18 +181,22 @@ namespace Capstone.Classes
                     MainMenu();
                 }
                 amountPaid = VM.GetAmountPaid(userPayment).ToString("C");
+                FW.WriteToLog("FEED MONEY", previousAmountPaid, amountPaid);
+                previousAmountPaid = amountPaid;
                 Console.Clear();
                 DisplayAmountDueAndAmountPaid();
+
             }
         }
 
         public void DisplayChangeAndEndTransaction()
         {
+            VM.CompleteTransaction(productCodes);
+            //FW.WriteToLog()
             Console.WriteLine(VM.GetChange());
             foreach (string item in VM.GetTypes(productCodes))
             {
-                Console.WriteLine(item);
-                VM.CompleteTransaction(productCodes);
+                Console.WriteLine(item);  
             }
             Console.WriteLine("Thank you for shoppin at Virtual Vending Machines.");
             Console.WriteLine("Press [1] to continue using the Virtual Vending Machine.");
