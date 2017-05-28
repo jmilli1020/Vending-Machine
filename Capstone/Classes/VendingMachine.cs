@@ -105,7 +105,6 @@ namespace Capstone.Classes
 
         public void CompleteTransaction(List<string> productCodes)
         {
-            string itemType = "";
             string productName = "";
             foreach (string productCode in productCodes)
             {
@@ -114,13 +113,11 @@ namespace Capstone.Classes
                     if (productCode == KVP.Key)
                     {
                         List<Items> items = KVP.Value;
-                        itemType = items[0].ReturnType();
                         productName = items[0].GetProductName();
                         KVP.Value.Remove(KVP.Value[0]);
                         FW.WriteToLog(productName, amountPaid.ToString("C"), amountDue.ToString("C"));
                     }
                 }
-                Console.WriteLine(itemType);
             }
         }
     }

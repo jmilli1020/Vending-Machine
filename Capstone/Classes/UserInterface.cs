@@ -42,7 +42,7 @@ namespace Capstone.Classes
                 }
                 else if (userInput == "2")
                 {
-                    break;
+                    Environment.Exit(0);
                 }
             }
             
@@ -68,6 +68,19 @@ namespace Capstone.Classes
                 currentSelections += " " + item.ToUpper();
             }
             return currentSelections;
+        }
+
+        public void ClearSelectionsPayments()
+        {
+            while (productCodes.Count > 0)
+            {
+                productCodes.Remove(productCodes[0]);
+            }
+            userPayment = "Q";
+            VM.GetAmountPaid(userPayment);
+            amountPaid = "";
+            amountDue = "";
+            MainMenu();
         }
 
         public void EnterSelections()
@@ -99,11 +112,7 @@ namespace Capstone.Classes
                 }
                 else if (userInput == "1")
                 {
-                    while (productCodes.Count > 0)
-                    {
-                        productCodes.Remove(productCodes[0]);
-                    }
-                    MainMenu();
+                    ClearSelectionsPayments();
                 }
                 else
                 {
@@ -150,14 +159,7 @@ namespace Capstone.Classes
                 }
                 else if (userPayment == "Q")
                 {
-                    while (productCodes.Count > 0)
-                    {
-                        productCodes.Remove(productCodes[0]);
-                    }
-                    VM.GetAmountPaid(userPayment);
-                    amountPaid = "";
-                    amountDue = "";
-                    MainMenu();
+                    ClearSelectionsPayments();
                 }
                 amountPaid = VM.GetAmountPaid(userPayment).ToString("C");
                 Console.Clear();
@@ -171,8 +173,21 @@ namespace Capstone.Classes
             foreach (string item in VM.GetTypes(productCodes))
             {
                 Console.WriteLine(item);
+                VM.CompleteTransaction(productCodes);
             }
-            Console.ReadLine();
+            Console.WriteLine("Thank you for shoppin at Virtual Vending Machines.");
+            Console.WriteLine("Press [1] to continue using the Virtual Vending Machine.");
+            Console.WriteLine("Press [2] to exit the veding machine.");
+            string userInput = Console.ReadLine();
+
+            if (userInput == "1")
+            {
+                MainMenu();
+            }
+            else if (userInput == "2");
+            {
+                Environment.Exit(0);
+            }
         }
 
 
