@@ -134,6 +134,7 @@ namespace Capstone.Classes
                 else if (userInput == "1")
                 {
                     ClearSelectionsPayments();
+                    VM.AddItemsBack(productCodes);
                     MainMenu();
                 }
                 else if (VM.DidUserEnterValidProductCode(userInput) && VM.RemoveItem(userInput))

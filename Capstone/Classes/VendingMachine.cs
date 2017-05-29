@@ -110,20 +110,25 @@ namespace Capstone.Classes
                 return false;
         }
 
-        //public AddItemsBack(List<string> productCodes)
-        //{
-        //    foreach (string productCode in productCodes)
-        //    {
-        //        foreach (KeyValuePair<string, List<Items>> KVP in inventory)
-        //        {
-        //            if (productCode == KVP.Key)
-        //            {
-        //                List<Items> items = KVP.Value;
-        //                KVP.Value.Add(KVP.Value[0]);
-        //            }
-        //        }
-        //    }
-        //}
+        public void AddItemsBack(List<string> productCodes)
+        {
+            List<Items> tempItemsToAdd = new List<Items>();
+            for (int i = 0; i < productCodes.Count; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    tempItemsToAdd.Add(SelectedItems[i]);
+                }
+                while(tempItemsToAdd.Count > 0)
+                {
+                    tempItemsToAdd.Remove(tempItemsToAdd[0]);
+                }
+            }
+            while(SelectedItems.Count > 0)
+            {
+                SelectedItems.Remove(SelectedItems[0]);
+            }
+        }
 
         public List<string> GetTypes()
         {
