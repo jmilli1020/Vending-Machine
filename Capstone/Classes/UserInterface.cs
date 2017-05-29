@@ -55,16 +55,16 @@ namespace Capstone.Classes
             Console.WriteLine((String.Format("{0," + ((Console.WindowWidth / 2) + ("Virtual Vending Machines Inc.".Length / 2)) + "}", "Virtual Vending Machines Inc.")));
         }
 
-        public void DisplayItems() // I want to display the items persistently. Ideally I would also display remaining stock.
+        public void DisplayItems()
         {
             Console.Clear();
             ApplicationTitle();
-            Console.WriteLine("Product Code".PadRight(15) + "Item".PadRight(15) + "Cost");
+            Console.WriteLine("Code".PadRight(8) + "Item".PadRight(13) + "Cost");
             using (StreamReader sr = new StreamReader(Path.Combine(Environment.CurrentDirectory, "vendingmachine.csv")))
                 {
                     while (!sr.EndOfStream)
                     {
-                        Console.WriteLine("".PadRight(5) + sr.ReadLine()); //Im thinking about making this centered.
+                        Console.WriteLine("".PadRight(5) + sr.ReadLine());
                     }
                 }
         }
@@ -142,14 +142,19 @@ namespace Capstone.Classes
                     productCodes.Add(userInput);
                     continue;
                 }
+                else if(!VM.DidUserEnterValidProductCode(userInput))
+                {
+                    Console.WriteLine("You've entered an invalid product code. Please press return and try again.");
+                    Console.ReadLine();
+                    continue;
+                }
                 else if (!VM.RemoveItem(userInput))
                 {
                     Console.WriteLine("Item is out of stock. Please press return and make a different selection.");
                     Console.ReadLine();
                     continue;
                 }
-                Console.WriteLine("You've entered an invalid product code. Please press return and try again.");
-                Console.ReadLine();
+                
             }
             Console.Clear();
             amountDue = VM.GetAmountDue().ToString("C");
@@ -208,12 +213,12 @@ namespace Capstone.Classes
         public void DisplayChangeAndEndTransaction()
         {
             ApplicationTitle();
-            VM.CompleteTransaction();
             Console.WriteLine(VM.GetChange());
             foreach (string item in VM.GetTypes())
             {
                 Console.WriteLine(item);  
             }
+            VM.CompleteTransaction();
             Console.WriteLine("Thank you for shopping at Virtual Vending Machines.");
             Console.WriteLine("Press [1] to continue using the Virtual Vending Machine.");
             Console.WriteLine("Press [2] to exit the veding machine.");
