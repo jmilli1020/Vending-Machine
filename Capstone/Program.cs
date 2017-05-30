@@ -12,6 +12,7 @@ namespace Capstone
         static void Main(string[] args)
         {
             UserInterface UI = new UserInterface();
+            UI.MainMenu();
         }
     }
 }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Capstone.Classes
 {
-    public class Items
+    public class Item
     {
-        public Items(decimal cost, string productName, string type)
+        public Item(decimal cost, string productName, string type)
         {
             this.cost = cost;
             this.productName = productName;

@@ -9,16 +9,14 @@ namespace Capstone.Classes
 {
     public class VendingMachine
     {
-        private Dictionary<string,List<Items>> inventory;
-        private List<Items> SelectedItems;
-        private VendingMachineFileWriter FW = new VendingMachineFileWriter();
-        
-        public VendingMachine(Dictionary<string, List<Items>> Inventory)
+        private Dictionary<string, List<Item>> inventory;
+        private List<Item> selectedItems = new List<Item>();
+        private VendingMachineFileWriter fw = new VendingMachineFileWriter();
+
+        public VendingMachine(Dictionary<string, List<Item>> inventory)
         {
-            this.inventory = Inventory;
+            this.inventory = inventory;
             this.amountDue = 0;
-            List<Items> SelectedItems = new List<Items>();
-            this.SelectedItems = SelectedItems;
         }
 
         private decimal amountDue;
@@ -28,15 +26,15 @@ namespace Capstone.Classes
         {
             decimal cost = 0;
 
-            foreach (Items item in SelectedItems)
+            foreach (Item item in selectedItems)
             {
                 cost = item.GetCost();
-                amountDue += cost; 
+                amountDue += cost;
             }
             return amountDue;
         }
 
-        public decimal GetAmountPaid(string userPayment)
+        public decimal AddMoney(string userPayment)
         {
             if (userPayment == "1")
             {
@@ -68,14 +66,8 @@ namespace Capstone.Classes
 
         public bool DidUserEnterValidProductCode(string productCode)
         {
-            foreach (KeyValuePair<string, List<Items>> KVP in inventory)
-            {
-                    if (KVP.Key == productCode)
-                    {
-                        return true;
-                    }
-            }
-            return false;
+            return inventory.ContainsKey(productCode);
+
         }
 
         public bool DidUserPayEnough()
@@ -90,50 +82,51 @@ namespace Capstone.Classes
         public string GetChange()
         {
             Change change = new Change();
-            string changeInCoins = "Your change is: " + (amountDue-amountPaid).ToString("C") + "\n"
+            string changeInCoins = "Your change is: " + (amountDue - amountPaid).ToString("C") + "\n"
                 + "Returning: " + change.GetChange(amountPaid, amountDue);
-            FW.WriteToLog("GIVE CHANGE", amountDue.ToString("C"), "$0.00");
+            fw.WriteToLog("GIVE CHANGE", amountDue.ToString("C"), "$0.00");
+
             return changeInCoins;
         }
 
         public bool RemoveItem(string userInput)
         {
-                foreach (KeyValuePair<string, List<Items>> KVP in inventory)
+            foreach (KeyValuePair<string, List<Item>> KVP in inventory)
+            {
+                if (userInput == KVP.Key && KVP.Value.Count > 0)
                 {
-                    if (userInput == KVP.Key && KVP.Value.Count > 0)
-                    {
-                        SelectedItems.Add(KVP.Value[0]);
-                        KVP.Value.Remove(KVP.Value[0]);
-                        return true;
-                    }
+                    selectedItems.Add(KVP.Value[0]);
+                    KVP.Value.Remove(KVP.Value[0]);
+                    return true;
                 }
-                return false;
+            }
+            return false;
         }
 
         public void AddItemsBack(List<string> productCodes)
         {
-            List<Items> tempItemsToAdd = new List<Items>();
+            List<Item> tempItemsToAdd = new List<Item>();
             for (int i = 0; i < productCodes.Count; i++)
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    tempItemsToAdd.Add(SelectedItems[i]);
+                    tempItemsToAdd.Add(selectedItems[i]);
                 }
-                while(tempItemsToAdd.Count > 0)
+                while (tempItemsToAdd.Count > 0)
                 {
                     tempItemsToAdd.Remove(tempItemsToAdd[0]);
                 }
             }
-            while(SelectedItems.Count > 0)
+            while (selectedItems.Count > 0)
             {
-                SelectedItems.Remove(SelectedItems[0]);
+                selectedItems.Remove(selectedItems[0]);
             }
         }
 
         public List<string> GetTypes()
         {
             List<string> types = new List<string>();
-            foreach (Items item in SelectedItems)
+            foreach (Item item in selectedItems)
             {
                 types.Add(item.ReturnType());
             }
@@ -144,14 +137,14 @@ namespace Capstone.Classes
         {
             string productName = "";
 
-            foreach (Items item in SelectedItems)
+            foreach (Item item in selectedItems)
             {
                 productName = item.GetProductName();
-                FW.WriteToLog(productName, amountPaid.ToString("C"), amountDue.ToString("C"));
+                fw.WriteToLog(productName, amountPaid.ToString("C"), amountDue.ToString("C"));
             }
-            while (SelectedItems.Count > 0)
+            while (selectedItems.Count > 0)
             {
-                SelectedItems.Remove(SelectedItems[0]);
+                selectedItems.Remove(selectedItems[0]);
             }
         }
     }

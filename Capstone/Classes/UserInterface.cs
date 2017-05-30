@@ -10,8 +10,8 @@ namespace Capstone.Classes
 {
     public class UserInterface
     {
-        private VendingMachineFileWriter FW;
-        private VendingMachine VM;
+        private VendingMachineFileWriter fw = new VendingMachineFileWriter();
+        private VendingMachine vm;
         private List<string> productCodes;
         private string userPayment;
         private string amountDue;
@@ -19,25 +19,24 @@ namespace Capstone.Classes
 
         public UserInterface()
         {
-            VendingMachineFileWriter FW = new VendingMachineFileWriter();
-            this.FW = FW;
-            VendingMachineFileReader FR = new VendingMachineFileReader();
-            Dictionary<string, List<Items>> Inventory = FR.ReadInventory();
-            VendingMachine VM = new VendingMachine(Inventory);
-            this.VM = VM;
-            List<string> productCodes = new List<string>();
-            this.productCodes = productCodes;
-            MainMenu();
+            VendingMachineFileReader fr = new VendingMachineFileReader();
+            Dictionary<string, List<Item>> Inventory = fr.ReadInventory();
+
+            this.vm = new VendingMachine(Inventory);
+            this.productCodes = new List<string>();
+
         }
 
         public void MainMenu()
         {
             Console.Clear();
-            while(true)
+            while (true)
             {
                 DisplayItems();
+
                 Console.WriteLine("[1] Make a selection.");
                 Console.WriteLine("[2] Exit vending machine");
+
                 string userInput = Console.ReadLine();
                 if (userInput == "1")
                 {
@@ -45,9 +44,9 @@ namespace Capstone.Classes
                 }
                 else if (userInput == "2")
                 {
-                    Environment.Exit(0);
+                    break;
                 }
-            }          
+            }
         }
 
         public void ApplicationTitle()
@@ -60,20 +59,21 @@ namespace Capstone.Classes
             Console.Clear();
             ApplicationTitle();
             Console.WriteLine("Code".PadRight(8) + "Item".PadRight(13) + "Cost");
+
             using (StreamReader sr = new StreamReader(Path.Combine(Environment.CurrentDirectory, "vendingmachine.csv")))
+            {
+                while (!sr.EndOfStream)
                 {
-                    while (!sr.EndOfStream)
-                    {
-                        Console.WriteLine("".PadRight(5) + sr.ReadLine());
-                    }
+                    Console.WriteLine("".PadRight(5) + sr.ReadLine());
                 }
+            }
         }
 
         public string DisplayCurrentSelections()
         {
             string currentSelections = "";
             foreach (string item in productCodes)
-            {              
+            {
                 currentSelections += " " + item.ToUpper();
             }
             return currentSelections;
@@ -86,7 +86,7 @@ namespace Capstone.Classes
                 productCodes.Remove(productCodes[0]);
             }
             userPayment = "Q";
-            VM.GetAmountPaid(userPayment);
+            vm.AddMoney(userPayment);
             amountPaid = "";
             amountDue = "";
         }
@@ -100,12 +100,12 @@ namespace Capstone.Classes
             {
                 MainMenu();
             }
-            else if (VM.DidUserEnterValidProductCode(userInput) && VM.RemoveItem(userInput))
+            else if (vm.DidUserEnterValidProductCode(userInput) && vm.RemoveItem(userInput))
             {
                 productCodes.Add(userInput);
                 Console.Clear();
             }
-            else if (!VM.RemoveItem(userInput))
+            else if (!vm.RemoveItem(userInput))
             {
                 Console.WriteLine("Item is out of stock. Please press return and make a different selection.");
                 Console.ReadLine();
@@ -116,7 +116,7 @@ namespace Capstone.Classes
                 Console.ReadLine();
                 EnterSelections();
             }
-            while(true)
+            while (true)
             {
                 DisplayItems();
                 Console.WriteLine("You've currently selected: " + DisplayCurrentSelections());
@@ -134,30 +134,30 @@ namespace Capstone.Classes
                 else if (userInput == "1")
                 {
                     ClearSelectionsPayments();
-                    VM.AddItemsBack(productCodes);
+                    vm.AddItemsBack(productCodes);
                     MainMenu();
                 }
-                else if (VM.DidUserEnterValidProductCode(userInput) && VM.RemoveItem(userInput))
+                else if (vm.DidUserEnterValidProductCode(userInput) && vm.RemoveItem(userInput))
                 {
                     productCodes.Add(userInput);
                     continue;
                 }
-                else if(!VM.DidUserEnterValidProductCode(userInput))
+                else if (!vm.DidUserEnterValidProductCode(userInput))
                 {
                     Console.WriteLine("You've entered an invalid product code. Please press return and try again.");
                     Console.ReadLine();
                     continue;
                 }
-                else if (!VM.RemoveItem(userInput))
+                else if (!vm.RemoveItem(userInput))
                 {
                     Console.WriteLine("Item is out of stock. Please press return and make a different selection.");
                     Console.ReadLine();
                     continue;
                 }
-                
+
             }
             Console.Clear();
-            amountDue = VM.GetAmountDue().ToString("C");
+            amountDue = vm.GetAmountDue().ToString("C");
             DisplayAmountDueAndAmountPaid();
             FeedMoney();
         }
@@ -183,7 +183,7 @@ namespace Capstone.Classes
                 userPayment = Console.ReadLine().ToUpper();
                 if (userPayment == "C")
                 {
-                    if(VM.DidUserPayEnough())
+                    if (vm.DidUserPayEnough())
                     {
                         Console.Clear();
                         DisplayChangeAndEndTransaction();
@@ -194,15 +194,15 @@ namespace Capstone.Classes
                         Console.WriteLine("Please insert more money before confirming payment.");
                         DisplayAmountDueAndAmountPaid();
                         FeedMoney();
-                    }                   
+                    }
                 }
                 else if (userPayment == "Q")
                 {
                     ClearSelectionsPayments();
                     MainMenu();
                 }
-                amountPaid = VM.GetAmountPaid(userPayment).ToString("C");
-                FW.WriteToLog("FEED MONEY", previousAmountPaid, amountPaid);
+                amountPaid = vm.AddMoney(userPayment).ToString("C");
+                fw.WriteToLog("FEED MONEY", previousAmountPaid, amountPaid);
                 previousAmountPaid = amountPaid;
                 Console.Clear();
                 DisplayAmountDueAndAmountPaid();
@@ -213,12 +213,12 @@ namespace Capstone.Classes
         public void DisplayChangeAndEndTransaction()
         {
             ApplicationTitle();
-            Console.WriteLine(VM.GetChange());
-            foreach (string item in VM.GetTypes())
+            Console.WriteLine(vm.GetChange());
+            foreach (string item in vm.GetTypes())
             {
-                Console.WriteLine(item);  
+                Console.WriteLine(item);
             }
-            VM.CompleteTransaction();
+            vm.CompleteTransaction();
             Console.WriteLine("Thank you for shopping at Virtual Vending Machines.");
             Console.WriteLine("Press [1] to continue using the Virtual Vending Machine.");
             Console.WriteLine("Press [2] to exit the veding machine.");

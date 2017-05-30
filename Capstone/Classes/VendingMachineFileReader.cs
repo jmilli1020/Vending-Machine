@@ -9,54 +9,70 @@ namespace Capstone.Classes
 {
     public class VendingMachineFileReader
     {
+        private const int SlotId = 0;
+        private const int ProductName = 1;
+        private const int Price = 2;
+        private const int InitialQuantity = 5;
+
         public VendingMachineFileReader()
         {
 
         }
 
-        public Dictionary<string, List<Items>> ReadInventory()
+        public Dictionary<string, List<Item>> ReadInventory()
         {
-            Dictionary<string, List<Items>> Inventory = new Dictionary<string, List<Items>>();
+            Dictionary<string, List<Item>> inventory = new Dictionary<string, List<Item>>();
             string directory = Environment.CurrentDirectory;
             string file = "vendingmachine.csv";
             string filePath = Path.Combine(directory, file);
 
-            using (StreamReader sr = new StreamReader(filePath))
+            try
             {
-                while (!sr.EndOfStream)
-                {
-                    string line = sr.ReadLine();
-                    string[] splits = line.Split('|');
-                    List<Items> ItemsList = new List<Items>();
-                    decimal cost = Decimal.Parse(splits[2]);
-                    string productName = (splits[1] + " " + splits[0]);
-                    string type = "";
 
-                    for (int i = 0; i < 5; i++)
+
+                using (StreamReader sr = new StreamReader(filePath))
+                {
+                    while (!sr.EndOfStream)
                     {
-                        if (splits[0].Substring(0, 1) == "A")
+                        string line = sr.ReadLine();
+                        string[] splits = line.Split('|');
+                        List<Item> itemList = new List<Item>();
+
+                        decimal cost = Decimal.Parse(splits[Price]);
+                        string productName = (splits[ProductName] + " " + splits[SlotId]);
+                        string type = "";
+
+                        for (int i = 0; i < InitialQuantity; i++)
                         {
-                            type = "Crunch Crunch, Yum!";
+                            if (splits[0].Substring(0, 1) == "A")
+                            {
+                                type = "Crunch Crunch, Yum!";
+                            }
+                            else if (splits[0].Substring(0, 1) == "B")
+                            {
+                                type = "Munch Munch, Yum!";
+                            }
+                            else if (splits[0].Substring(0, 1) == "C")
+                            {
+                                type = "Glug Glug, Yum!";
+                            }
+                            else if (splits[0].Substring(0, 1) == "D")
+                            {
+                                type = "Chew Chew, Yum!";
+                            }
+                            Item Item = new Item(cost, productName, type);
+                            itemList.Add(Item);
+                            inventory[splits[0]] = itemList;
                         }
-                        else if (splits[0].Substring(0, 1) == "B")
-                        {
-                            type = "Munch Munch, Yum!";
-                        }
-                        else if (splits[0].Substring(0, 1) == "C")
-                        {
-                            type = "Glug Glug, Yum!";
-                        }
-                        else if (splits[0].Substring(0, 1) == "D")
-                        {
-                            type = "Chew Chew, Yum!";
-                        }
-                        Items Item = new Items(cost, productName, type);
-                        ItemsList.Add(Item);
-                        Inventory[splits[0]] = ItemsList;
                     }
                 }
             }
-            return Inventory;
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            return inventory;
         }
     }
 }
